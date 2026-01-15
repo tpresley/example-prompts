@@ -14,7 +14,7 @@ BASE_URL="https://api.kindo.ai/v1"
 
 # Function to get run ID from the response
 get_run_id() {
-  echo "$1" | grep -o '"runId":"[^"]*"' | cut -d'"' -f4
+  echo "$1" | jq -r '.runId'
 }
 
 # Function to poll for run results
@@ -28,7 +28,7 @@ poll_run_results() {
   while [ $attempt -lt $max_attempts ]; do
     # Get run status
     response=$(curl -s -H "x-api-key: $API_KEY" "$BASE_URL/runs/$run_id")
-    status=$(echo "$response" | grep -o '"status":"[^"]*"' | cut -d'"' -f4)
+    status=$(echo "$response" | jq -r '.status'
     
     # Print dots while waiting
     if [ "$status" == "in_progress" ]; then
@@ -37,7 +37,7 @@ poll_run_results() {
       ((attempt++))
     elif [ "$status" == "success" ]; then
       # Print result on success
-      result=$(echo "$response" | grep -o '"result":"[^"]*"' | cut -d'"' -f4)
+      result=$(echo "$response" | jq -r '.result')
       echo -e "\nAgent run completed successfully.\n\nResult:\n\n$result\n\n"
       return
     else
