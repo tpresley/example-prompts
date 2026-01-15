@@ -51,19 +51,11 @@ poll_run_results() {
   echo -e "\nError: Timeout. No results found after 120 seconds."
 }
 
-# Find config files
-config_files=""
-for file in *.bck *.tcp *.conf *.BCK *.TCP *.CONF; do
-  if [ -f "$file" ]; then
-    config_files="$config_files\n\n#######$file#######\n\n$(cat $file)"
-  fi
-done
-
 # Run agent
 run_response=$(curl -s -X POST \
   -H "x-api-key: $API_KEY" \
   -H "Content-Type: application/json" \
-  -d "{\"agentId\":\"$AGENT_ID\",\"inputs\":[{\"name\":\"Configurations\",\"value\":\"$config_files\"}]}" \
+  -d "{\"agentId\":\"$AGENT_ID\"}" \
   "$BASE_URL/agents/runs")
 
 run_id=$(get_run_id "$run_response")
